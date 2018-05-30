@@ -47,6 +47,13 @@ var FreshBooksApiProvider = /** @class */ (function () {
         this.getAuthorization = function () {
             return new Promise(function (resolve) {
                 _this.platform.ready().then(function () {
+                    if (_this.platform.is("core") == true) {
+                        var qs_code = _this.getParameterByName("code");
+                        if (!!qs_code) {
+                            _this.helper.ls.set("code", qs_code);
+                            location.reload();
+                        }
+                    }
                     _this.helper.ls.get("code").then(function (code) {
                         if (!code) {
                             _this.helper.ls.remove("auth");
@@ -80,6 +87,18 @@ var FreshBooksApiProvider = /** @class */ (function () {
                     _this._getInvoice(auth.access_token, account_id, searchString, resolve);
                 });
             });
+        };
+        this.getParameterByName = function (name, url) {
+            if (url === void 0) { url = null; }
+            if (!url)
+                url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
+            if (!results)
+                return null;
+            if (!results[2])
+                return "";
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
         };
         if (this.platform.is("core") == true) {
             this.authenticationUrl =
