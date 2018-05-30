@@ -25677,3 +25677,15 @@ ion-navbar.toolbar {
   min-height: calc(46px + constant(safe-area-inset-bottom));
   min-height: calc(46px + env(safe-area-inset-bottom));
 }
+
+page-home .unpaid {
+  color: red;
+}
+
+page-home .paid {
+  color: green;
+}
+
+page-home .alert-message, page-home .my-message {
+  text-align: left !important;
+}
