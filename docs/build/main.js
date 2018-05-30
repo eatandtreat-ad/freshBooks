@@ -50,27 +50,33 @@ var FreshBooksApiProvider = /** @class */ (function () {
                     if (_this.platform.is("core") == true) {
                         var qs_code = _this.getParameterByName("code");
                         if (!!qs_code) {
-                            _this.helper.ls.set("code", qs_code);
-                            location.reload();
-                        }
-                    }
-                    _this.helper.ls.get("code").then(function (code) {
-                        if (!code) {
-                            _this.helper.ls.remove("auth");
-                            var browser = _this.iab.create(_this.authenticationUrl);
-                            browser.show();
-                        }
-                        else {
-                            _this.helper.ls.get("auth").then(function (auth) {
-                                if (!auth) {
-                                    _this._getAuthWithCode(code, resolve);
-                                }
-                                else {
-                                    _this._getAuthWithAuth(auth, resolve);
-                                }
+                            _this.helper.ls.set("code", qs_code).then(function () {
+                                _this._webAuthorization(resolve);
                             });
                         }
-                    });
+                        else {
+                            _this._webAuthorization(resolve);
+                        }
+                    }
+                    else {
+                        _this.helper.ls.get("code").then(function (code) {
+                            if (!code) {
+                                _this.helper.ls.remove("auth");
+                                var browser = _this.iab.create(_this.authenticationUrl);
+                                browser.show();
+                            }
+                            else {
+                                _this.helper.ls.get("auth").then(function (auth) {
+                                    if (!auth) {
+                                        _this._getAuthWithCode(code, resolve);
+                                    }
+                                    else {
+                                        _this._getAuthWithAuth(auth, resolve);
+                                    }
+                                });
+                            }
+                        });
+                    }
                 });
             });
         };
@@ -110,6 +116,25 @@ var FreshBooksApiProvider = /** @class */ (function () {
         }
         console.log("Hello FreshBooksApiProvider Provider");
     }
+    FreshBooksApiProvider.prototype._webAuthorization = function (resolve) {
+        var _this = this;
+        this.helper.ls.get("code").then(function (code) {
+            if (!code) {
+                _this.helper.ls.remove("auth");
+                location.href = _this.authenticationUrl;
+            }
+            else {
+                _this.helper.ls.get("auth").then(function (auth) {
+                    if (!auth) {
+                        _this._getAuthWithCode(code, resolve);
+                    }
+                    else {
+                        _this._getAuthWithAuth(auth, resolve);
+                    }
+                });
+            }
+        });
+    };
     FreshBooksApiProvider.prototype._getAuthWithCode = function (code, resolve) {
         var _this = this;
         /*
