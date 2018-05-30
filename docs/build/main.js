@@ -40,6 +40,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
         this.platform = platform;
         this.helper = helper;
         this.iab = iab;
+        this.enableProxy = true;
         this.redirect_uri = "eatandtreat://freshBooks/";
         this.client_secret = "8fa4bc86b60768bcc77d385f058ed0c227c50b0861dfa35977c01e046781d636";
         this.client_id = "71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13";
@@ -152,7 +153,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
     
           */
         var url = "/token";
-        if (this.platform.is("core") == true) {
+        if (this.platform.is("core") == true && this.enableProxy) {
             url = "/token";
         }
         else {
@@ -195,7 +196,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
     
           */
         var url = "/token";
-        if (this.platform.is("core") == true) {
+        if (this.platform.is("core") == true && this.enableProxy) {
             url = "/token";
         }
         else {
@@ -231,7 +232,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
           https://api.freshbooks.com/accounting/account/K5Vxa/invoices/invoices?search%5Bnotes%5D=Wednesday
           */
         var url = "/freshbooks";
-        if (this.platform.is("core") == true) {
+        if (this.platform.is("core") == true && this.enableProxy) {
             url = "/freshbooks";
         }
         else {
@@ -265,7 +266,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
           https://api.freshbooks.com/auth/api/v1/users/me
           */
         var url = "/freshbooks";
-        if (this.platform.is("core") == true) {
+        if (this.platform.is("core") == true && this.enableProxy) {
             url = "/freshbooks";
         }
         else {
