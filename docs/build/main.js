@@ -107,6 +107,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         };
         if (this.platform.is("core") == true) {
+            this.redirect_uri = "https://eatandtreat-ad.github.io/freshBooks";
             this.authenticationUrl =
                 "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=https://eatandtreat-ad.github.io/freshBooks";
         }
