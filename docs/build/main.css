@@ -25689,3 +25689,15 @@ page-home .paid {
 page-home .alert-message, page-home .my-message {
   text-align: left !important;
 }
+
+.alert-checkbox-label {
+  text-overflow: clip !important;
+}
+
+page-modal .unpaid {
+  color: red;
+}
+
+page-modal .paid {
+  color: green;
+}
