@@ -1,0 +1,15 @@
+page-home {
+  .unpaid {
+    color: red;
+  }
+  .paid {
+    color: green;
+  }
+  .alert-message, .my-message {
+    text-align: left !important;
+  }
+  
+}
+.alert-checkbox-label{
+    text-overflow: clip !important;
+}

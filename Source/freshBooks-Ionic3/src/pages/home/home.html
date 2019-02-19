@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-navbar>
+    <!-- <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button> -->
+    <ion-title>FreshBooks</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <h3>Invoices of </h3>
+  <!-- {{business_memberships.length}}{{selected_business_membership}} -->
+  <ion-item>
+    <ion-label>Business</ion-label>
+    <ion-select [(ngModel)]="selected_business_membership">
+      <ion-option *ngFor="let business_membership of business_memberships" [value]="business_membership.business.account_id">{{business_membership.business.name}}</ion-option>
+    </ion-select>
+  </ion-item>
+  <br/>
+  <!-- {{data|json}} -->
+  <ion-item>
+    <ion-label>Date</ion-label>
+    {{myDate}}
+    <ion-datetime displayFormat="DDD DD MMMM YYYY" pickerFormat="DDD DD MMMM YYYY" [(ngModel)]="myDate" (ngModelChange)="dateChanged()"></ion-datetime>
+  </ion-item>
+  <ion-list>
+    <ion-item>
+
+      <ion-row no-padding>
+        <ion-col no-padding>
+          <div>
+            <h2> </h2>
+          </div>
+        </ion-col>
+
+        <ion-col no-padding text-right>
+          <ion-note>
+            <h2>outstanding</h2>
+          </ion-note>
+        </ion-col>
+      </ion-row>
+
+    </ion-item>
+    <ion-item *ngFor="let invoice of data" (click)="showDetail(invoice,$event)">
+
+      <ion-row no-padding>
+        <ion-col no-padding>
+          <div>
+            <h2>{{invoice.fname}} {{invoice.lname}}</h2>
+          </div>
+        </ion-col>
+
+        <ion-col no-padding text-right>
+          <ion-note>
+            <h2 [class]="invoice.payment_status">{{invoice.payment_status=="unpaid"?invoice.outstanding.amount:"PAID"}}</h2>
+          </ion-note>
+        </ion-col>
+      </ion-row>
+
+      <p>{{invoice.notes}}</p>
+    </ion-item>
+  </ion-list>
+  <li *ngIf="data?.length == 0">
+    <span class="search_no_results">
+      No invoice found
+    </span>
+  </li>
+</ion-content>

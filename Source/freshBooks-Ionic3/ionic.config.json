@@ -1,0 +1,22 @@
+{
+  "name": "freshBooks",
+  "app_id": "",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  },
+  "proxies": [
+    {
+      "path": "/freshbooks",
+      "proxyUrl": "https://api.freshbooks.com"
+    },
+    {
+      "path": "/invoices",
+      "proxyUrl": "https://api.freshbooks.com/accounting/account/K5Vxa/invoices"
+    },
+    {
+      "path": "/token",
+      "proxyUrl": "https://api.freshbooks.com/auth/oauth/token"
+    }
+  ]
+}
