@@ -28,19 +28,19 @@ export class HomePage {
     this.showLoading();
     this.freshBooksApiProvider.getBusiness_memberships().then((data: any) => {
       this.hideLoading();
-      this.business_memberships = data.response.business_memberships;
-      this.selected_business_membership = this.business_memberships[0].business.account_id;
+      this.business_memberships = data.organizations;
+      this.selected_business_membership = this.business_memberships[0].organization_id;
       this.myDate = moment().format("YYYY-MM-DD");
       this.dateChanged();
     });
   }
   dateChanged = () => {
     this.showLoading();
-    let date = moment(this.myDate).format("dddd D MMM");
+    let date = moment(this.myDate).format("YYYY-MM-DD");
     this.freshBooksApiProvider
       .getInvoices(this.selected_business_membership, date)
       .then((data: any) => {
-        this.data = data.response.result.invoices;
+        this.data = data.invoices;
         this.hideLoading();
       });
   };
@@ -60,11 +60,44 @@ export class HomePage {
   }
   showDetail = invoice => {
     console.log(invoice);
-    let modalPage = this.modalCtrl.create("ModalPage", { invoice: invoice });
-    modalPage.present();
+    if (invoice.hasOwnProperty("line_items")) {
+      this.showItems(invoice);
+    } else {
+      this.showLoading();
+      this.freshBooksApiProvider
+        .getInvoice(this.selected_business_membership, invoice.invoice_id)
+        .then((data: any) => {
+          debugger;
+          Object.assign(invoice,data.invoice);
+          // invoice.lines = data.invoice.line_items;
+          this.hideLoading();
+          this.showItems(invoice);
+        });
+    }
   };
   showDetail2 = invoice => {
     console.log(invoice);
+    if (invoice.hasOwnProperty("lines")) {
+      this.showItems2(invoice);
+    } else {
+      this.showLoading();
+      this.freshBooksApiProvider
+        .getInvoice(this.selected_business_membership, invoice.invoice_id)
+        .then((data: any) => {
+          debugger;
+          invoice.lines = data.invoice.line_items;
+          this.hideLoading();
+          this.showItems2(invoice);
+        });
+    }
+  };
+
+  private showItems(invoice: any) {
+    let modalPage = this.modalCtrl.create("ModalPage", { invoice: invoice });
+    modalPage.present();
+  }
+
+  private showItems2(invoice: any) {
     let inputs = [];
     for (let i = 0; i < invoice.lines.length; i++) {
       inputs.push({
@@ -106,9 +139,8 @@ export class HomePage {
       <strong>Outstanding: </strong>`+invoice.outstanding.amount+' '+invoice.outstanding.code+`
       */
       inputs: inputs,
-
       buttons: ["Dismiss"]
     });
     alert.present();
-  };
+  }
 }

@@ -8,15 +8,15 @@
   "proxies": [
     {
       "path": "/freshbooks",
-      "proxyUrl": "https://api.freshbooks.com"
+      "proxyUrl": "https://invoice.zoho.com/api/v3"
     },
     {
       "path": "/invoices",
-      "proxyUrl": "https://api.freshbooks.com/accounting/account/K5Vxa/invoices"
+      "proxyUrl": "https://invoice.zoho.com/api/v3/invoices"
     },
     {
       "path": "/token",
-      "proxyUrl": "https://api.freshbooks.com/auth/oauth/token"
+      "proxyUrl": "https://accounts.zoho.com/oauth/v2/token"
     }
   ]
 }

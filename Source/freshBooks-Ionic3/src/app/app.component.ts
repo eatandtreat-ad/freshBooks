@@ -55,15 +55,24 @@ export class MyApp {
         })
         .subscribe(
           match => {
-            this.helper.ls.set("code", match.$args.code).then(()=>{
+            this.helper.ls.set("code", match.$args.code).then(() => {
               debugger;
               location.reload();
             });
-            
+
             console.log("Successfully matched route", match);
           },
           nomatch => {
             console.error("Got a deeplink that didn't match", nomatch);
+            if (nomatch == "cordova_not_available") {
+              //try as web
+              // var url = new URL(window.location);
+              // var code = url.searchParams.get("code");
+              // console.log(code);
+              // this.helper.ls.set("code", code).then(() => {
+                
+              // });
+            }
           }
         );
     });

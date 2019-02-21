@@ -42,9 +42,10 @@ var FreshBooksApiProvider = /** @class */ (function () {
         this.iab = iab;
         this.enableProxy = true;
         this.redirect_uri = "eatandtreat://freshBooks/";
-        this.client_secret = "8fa4bc86b60768bcc77d385f058ed0c227c50b0861dfa35977c01e046781d636";
-        this.client_id = "71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13";
-        this.authenticationUrl = "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=eatandtreat://freshBooks/";
+        this.client_secret = "96b65b3fcdfbba33674eeec236c321ae0f1cef230e";
+        this.client_id = "1000.3RIXSTO5VT2E91130KXCC1VIKDACVV";
+        this.zoho_scope = "ZohoInvoice.expenses.READ,ZohoInvoice.projects.READ,ZohoInvoice.creditnotes.READ,ZohoInvoice.customerpayments.READ,ZohoInvoice.estimates.READ,ZohoInvoice.settings.READ,ZohoInvoice.contacts.Create,ZohoInvoice.contacts.UPDATE,ZohoInvoice.contacts.READ,ZohoInvoice.contacts.DELETE,ZohoInvoice.invoices.READ";
+        this.authenticationUrl = "";
         this.getAuthorization = function () {
             return new Promise(function (resolve) {
                 _this.platform.ready().then(function () {
@@ -68,12 +69,14 @@ var FreshBooksApiProvider = /** @class */ (function () {
                             }
                             else {
                                 _this.helper.ls.get("auth").then(function (auth) {
-                                    if (!auth) {
-                                        _this._getAuthWithCode(code, resolve);
-                                    }
-                                    else {
-                                        _this._getAuthWithAuth(auth, resolve);
-                                    }
+                                    _this.helper.ls.get("refresh_token").then(function (refresh_token) {
+                                        if (!auth) {
+                                            _this._getAuthWithCode(code, resolve);
+                                        }
+                                        else {
+                                            _this._getAuthWithAuth(auth, refresh_token, resolve);
+                                        }
+                                    });
                                 });
                             }
                         });
@@ -91,7 +94,17 @@ var FreshBooksApiProvider = /** @class */ (function () {
         this.getInvoices = function (account_id, searchString) {
             return new Promise(function (resolve) {
                 _this.getAuthorization().then(function (auth) {
-                    _this._getInvoice(auth.access_token, account_id, searchString, resolve);
+                    _this._getInvoices(auth.access_token, account_id, searchString, resolve);
+                });
+            });
+        };
+        this.getInvoice = function (account_id, invoice_id) {
+            return new Promise(function (resolve) {
+                // this.getAuthorization().then((auth: any) => {
+                //   this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
+                // });
+                _this.helper.ls.get("auth").then(function (auth) {
+                    _this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
                 });
             });
         };
@@ -108,13 +121,31 @@ var FreshBooksApiProvider = /** @class */ (function () {
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         };
         if (this.platform.is("core") == true) {
-            this.redirect_uri = "https://eatandtreat-ad.github.io/freshBooks";
+            this.redirect_uri = "http://localhost:8100";
+            this.client_secret = "ca26cbcf9331671d6a33f7a3cb58b699376ab3ab72";
+            this.client_id = "1000.ES1M6NYBATU881971BF1X0142A9JOM";
             this.authenticationUrl =
-                "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=https://eatandtreat-ad.github.io/freshBooks";
+                "https://accounts.zoho.com/oauth/v2/auth?" +
+                    "scope=" +
+                    this.zoho_scope +
+                    "&client_id=" +
+                    this.client_id +
+                    "&state=testing&response_type=code&redirect_uri=" +
+                    this.redirect_uri +
+                    "&access_type=offline";
+            // "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=https://eatandtreat-ad.github.io/freshBooks";
         }
         else {
             this.authenticationUrl =
-                "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=eatandtreat://freshBooks/";
+                "https://accounts.zoho.com/oauth/v2/auth?" +
+                    "scope=" +
+                    this.zoho_scope +
+                    "&client_id=" +
+                    this.client_id +
+                    "&state=testing&response_type=code&redirect_uri=" +
+                    this.redirect_uri +
+                    "&access_type=offline";
+            // "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=eatandtreat://freshBooks/";
         }
         console.log("Hello FreshBooksApiProvider Provider");
     }
@@ -127,12 +158,14 @@ var FreshBooksApiProvider = /** @class */ (function () {
             }
             else {
                 _this.helper.ls.get("auth").then(function (auth) {
-                    if (!auth) {
-                        _this._getAuthWithCode(code, resolve);
-                    }
-                    else {
-                        _this._getAuthWithAuth(auth, resolve);
-                    }
+                    _this.helper.ls.get("refresh_token").then(function (refresh_token) {
+                        if (!auth) {
+                            _this._getAuthWithCode(code, resolve);
+                        }
+                        else {
+                            _this._getAuthWithAuth(auth, refresh_token, resolve);
+                        }
+                    });
                 });
             }
         });
@@ -149,7 +182,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
             "code": "<insert your authorization code>",
             "client_id": "<insert your client id>",
             "redirect_uri": "https://localhost:3000/just_an_example"
-          }' "https://api.freshbooks.com/auth/oauth/token"
+          }' "https://api.freshbooks.com/auth/oauth/token" //
     
           */
         var url = "/token";
@@ -157,17 +190,34 @@ var FreshBooksApiProvider = /** @class */ (function () {
             url = "/token";
         }
         else {
-            url = "https://api.freshbooks.com/auth/oauth/token";
+            url = "https://accounts.zoho.com/oauth/v2/token";
         }
+        //Append params in query string fo ZOHO
+        url +=
+            "?" +
+                "code=" +
+                code +
+                "&" +
+                "client_id=" +
+                this.client_id +
+                "&" +
+                "client_secret=" +
+                this.client_secret +
+                "&" +
+                "redirect_uri=" +
+                this.redirect_uri +
+                "&" +
+                "grant_type=" +
+                "authorization_code";
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
-        headers.append("Api-Version", "alpha");
+        // headers.append("Api-Version", "alpha");
         headers.append("Content-Type", "application/json");
         var body = {
-            grant_type: "authorization_code",
-            client_secret: this.client_secret,
             code: code,
             client_id: this.client_id,
-            redirect_uri: this.redirect_uri
+            client_secret: this.client_secret,
+            redirect_uri: this.redirect_uri,
+            grant_type: "authorization_code"
         };
         var options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* RequestOptions */]({ headers: headers });
         this.http
@@ -176,11 +226,14 @@ var FreshBooksApiProvider = /** @class */ (function () {
             .subscribe(function (data) {
             // we've got back the raw data, now generate the core schedule data
             // and save the data for later reference
-            _this.helper.ls.set("auth", data);
-            resolve(data);
+            _this.helper.ls.set("auth", data).then(function () {
+                _this.helper.ls.set("refresh_token", data.refresh_token).then(function () {
+                    resolve(data);
+                });
+            });
         });
     };
-    FreshBooksApiProvider.prototype._getAuthWithAuth = function (auth, resolve) {
+    FreshBooksApiProvider.prototype._getAuthWithAuth = function (auth, refresh_token, resolve) {
         var _this = this;
         /*
           curl -X POST
@@ -192,7 +245,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
             "code": "<insert your authorization code>",
             "client_id": "<insert your client id>",
             "redirect_uri": "https://localhost:3000/just_an_example"
-          }' "https://api.freshbooks.com/auth/oauth/token"
+          }' "https://api.freshbooks.com/auth/oauth/token" //
     
           */
         var url = "/token";
@@ -200,17 +253,33 @@ var FreshBooksApiProvider = /** @class */ (function () {
             url = "/token";
         }
         else {
-            url = "https://api.freshbooks.com/auth/oauth/token";
+            url = "https://accounts.zoho.com/oauth/v2/token";
         }
+        url +=
+            "?" +
+                "refresh_token=" +
+                refresh_token +
+                "&" +
+                "client_id=" +
+                this.client_id +
+                "&" +
+                "client_secret=" +
+                this.client_secret +
+                "&" +
+                "redirect_uri=" +
+                this.redirect_uri +
+                "&" +
+                "grant_type=" +
+                "refresh_token";
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
         headers.append("Api-Version", "alpha");
         headers.append("Content-Type", "application/json");
         var body = {
-            grant_type: "refresh_token",
-            client_secret: this.client_secret,
             refresh_token: auth.refresh_token,
             client_id: this.client_id,
-            redirect_uri: this.redirect_uri
+            client_secret: this.client_secret,
+            redirect_uri: this.redirect_uri,
+            grant_type: "refresh_token"
         };
         var options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* RequestOptions */]({ headers: headers });
         this.http
@@ -219,11 +288,12 @@ var FreshBooksApiProvider = /** @class */ (function () {
             .subscribe(function (data) {
             // we've got back the raw data, now generate the core schedule data
             // and save the data for later reference
-            _this.helper.ls.set("auth", data);
-            resolve(data);
+            _this.helper.ls.set("auth", data).then(function () {
+                resolve(data);
+            });
         });
     };
-    FreshBooksApiProvider.prototype._getInvoice = function (access_token, account_id, searchString, resolve) {
+    FreshBooksApiProvider.prototype._getInvoice = function (access_token, account_id, invoice_id, resolve) {
         /*
           curl -X GET
           -H 'Authorization: Bearer 8763331008cf21cdf7a6ad3a36753734e599ff96d4b80544446da4033191dd00'
@@ -236,17 +306,43 @@ var FreshBooksApiProvider = /** @class */ (function () {
             url = "/freshbooks";
         }
         else {
-            url = "https://api.freshbooks.com";
+            url = "https://invoice.zoho.com/api/v3";
         }
-        url +=
-            "/accounting/account/" +
-                account_id +
-                "/invoices/invoices?include%5B%5D=lines&search%5Bnotes%5D=" +
-                searchString;
+        url += "/invoices/" + invoice_id;
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
         headers.append("Content-Type", "application/json");
-        headers.append("Api-Version", "alpha");
-        headers.append("Authorization", "Bearer " + access_token);
+        headers.append("Authorization", "Zoho-oauthtoken " + access_token);
+        headers.append("X-com-zoho-invoice-organizationid", account_id);
+        var options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* RequestOptions */]({ headers: headers });
+        this.http
+            .request(url, options)
+            .map(function (res) { return res.json(); })
+            .subscribe(function (data) {
+            // we've got back the raw data, now generate the core schedule data
+            // and save the data for later reference
+            resolve(data);
+        });
+    };
+    FreshBooksApiProvider.prototype._getInvoices = function (access_token, account_id, searchString, resolve) {
+        /*
+          curl -X GET
+          -H 'Authorization: Bearer 8763331008cf21cdf7a6ad3a36753734e599ff96d4b80544446da4033191dd00'
+          -H 'Api-Version: alpha'
+          -H 'Content-Type: application/json'
+          https://api.freshbooks.com/accounting/account/K5Vxa/invoices/invoices?search%5Bnotes%5D=Wednesday
+          */
+        var url = "/freshbooks";
+        if (this.platform.is("core") == true && this.enableProxy) {
+            url = "/freshbooks";
+        }
+        else {
+            url = "https://invoice.zoho.com/api/v3";
+        }
+        url += "/invoices?due_date=" + searchString;
+        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
+        headers.append("Content-Type", "application/json");
+        headers.append("Authorization", "Zoho-oauthtoken " + access_token);
+        headers.append("X-com-zoho-invoice-organizationid", account_id);
         var options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* RequestOptions */]({ headers: headers });
         this.http
             .request(url, options)
@@ -258,6 +354,7 @@ var FreshBooksApiProvider = /** @class */ (function () {
         });
     };
     FreshBooksApiProvider.prototype._getBusiness_memberships = function (access_token, resolve) {
+        var _this = this;
         /*
           curl -X GET \
           -H 'Authorization: Bearer <insert your bearer here>' \
@@ -270,13 +367,13 @@ var FreshBooksApiProvider = /** @class */ (function () {
             url = "/freshbooks";
         }
         else {
-            url = "https://api.freshbooks.com";
+            url = "https://invoice.zoho.com/api/v3";
         }
-        url += "/auth/api/v1/users/me";
+        url += "/organizations";
         var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* Headers */]();
-        headers.append("Content-Type", "application/json");
-        headers.append("Api-Version", "alpha");
-        headers.append("Authorization", "Bearer " + access_token);
+        // headers.append("Content-Type", "application/json");
+        // headers.append("Api-Version", "alpha");
+        headers.append("Authorization", "Zoho-oauthtoken " + access_token);
         var options = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["d" /* RequestOptions */]({ headers: headers });
         this.http
             .request(url, options)
@@ -285,7 +382,19 @@ var FreshBooksApiProvider = /** @class */ (function () {
             // we've got back the raw data, now generate the core schedule data
             // and save the data for later reference
             resolve(data);
+        }, function (error) {
+            //ERROR
+            console.log(error);
+            if (error.status == 401) {
+                //Remove code and auth
+                _this.resetAppVariableToLoginAgain();
+            }
         });
+    };
+    FreshBooksApiProvider.prototype.resetAppVariableToLoginAgain = function () {
+        this.helper.ls.remove("auth");
+        this.helper.ls.remove("code");
+        location.reload();
     };
     FreshBooksApiProvider = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
@@ -434,11 +543,11 @@ var HomePage = /** @class */ (function () {
         this.business_memberships = [];
         this.dateChanged = function () {
             _this.showLoading();
-            var date = __WEBPACK_IMPORTED_MODULE_3_moment___default()(_this.myDate).format("dddd D MMM");
+            var date = __WEBPACK_IMPORTED_MODULE_3_moment___default()(_this.myDate).format("YYYY-MM-DD");
             _this.freshBooksApiProvider
                 .getInvoices(_this.selected_business_membership, date)
                 .then(function (data) {
-                _this.data = data.response.result.invoices;
+                _this.data = data.invoices;
                 _this.hideLoading();
             });
         };
@@ -451,53 +560,44 @@ var HomePage = /** @class */ (function () {
         };
         this.showDetail = function (invoice) {
             console.log(invoice);
-            var modalPage = _this.modalCtrl.create("ModalPage", { invoice: invoice });
-            modalPage.present();
+            if (invoice.hasOwnProperty("line_items")) {
+                _this.showItems(invoice);
+            }
+            else {
+                _this.showLoading();
+                _this.freshBooksApiProvider
+                    .getInvoice(_this.selected_business_membership, invoice.invoice_id)
+                    .then(function (data) {
+                    debugger;
+                    Object.assign(invoice, data.invoice);
+                    // invoice.lines = data.invoice.line_items;
+                    _this.hideLoading();
+                    _this.showItems(invoice);
+                });
+            }
         };
         this.showDetail2 = function (invoice) {
             console.log(invoice);
-            var inputs = [];
-            for (var i = 0; i < invoice.lines.length; i++) {
-                inputs.push({
-                    type: "checkbox",
-                    label: invoice.lines[i].qty + "-" + invoice.lines[i].name,
-                    value: invoice.lines[i].qty + "-" + invoice.lines[i].name,
-                    placeholder: invoice.lines[i].name,
-                    checked: true
-                    // disabled: true
+            if (invoice.hasOwnProperty("lines")) {
+                _this.showItems2(invoice);
+            }
+            else {
+                _this.showLoading();
+                _this.freshBooksApiProvider
+                    .getInvoice(_this.selected_business_membership, invoice.invoice_id)
+                    .then(function (data) {
+                    debugger;
+                    invoice.lines = data.invoice.line_items;
+                    _this.hideLoading();
+                    _this.showItems2(invoice);
                 });
             }
-            var alert = _this.alertCtrl.create({
-                title: invoice.current_organization,
-                subTitle: '<span class="' +
-                    invoice.payment_status +
-                    '">STATUS : ' +
-                    invoice.display_status +
-                    "</span>",
-                message: "\n          <div class=\"my-message\">\n            \n            <strong>Address: </strong>" +
-                    invoice.street +
-                    "\n            \n          </div>\n      ",
-                /*
-                <strong>Description: </strong>`+invoice.description+`
-                <br/>
-                <hr>
-                <br/>
-                <strong>Totat: </strong>`+invoice.amount.amount+' '+invoice.amount.code+`
-                <br/>
-                <strong>Paid: </strong>`+invoice.paid.amount+' '+invoice.paid.code+`
-                <br/>
-                <strong>Outstanding: </strong>`+invoice.outstanding.amount+' '+invoice.outstanding.code+`
-                */
-                inputs: inputs,
-                buttons: ["Dismiss"]
-            });
-            alert.present();
         };
         this.showLoading();
         this.freshBooksApiProvider.getBusiness_memberships().then(function (data) {
             _this.hideLoading();
-            _this.business_memberships = data.response.business_memberships;
-            _this.selected_business_membership = _this.business_memberships[0].business.account_id;
+            _this.business_memberships = data.organizations;
+            _this.selected_business_membership = _this.business_memberships[0].organization_id;
             _this.myDate = __WEBPACK_IMPORTED_MODULE_3_moment___default()().format("YYYY-MM-DD");
             _this.dateChanged();
         });
@@ -506,9 +606,51 @@ var HomePage = /** @class */ (function () {
         this.loading.dismiss();
         this.loading = null;
     };
+    HomePage.prototype.showItems = function (invoice) {
+        var modalPage = this.modalCtrl.create("ModalPage", { invoice: invoice });
+        modalPage.present();
+    };
+    HomePage.prototype.showItems2 = function (invoice) {
+        var inputs = [];
+        for (var i = 0; i < invoice.lines.length; i++) {
+            inputs.push({
+                type: "checkbox",
+                label: invoice.lines[i].qty + "-" + invoice.lines[i].name,
+                value: invoice.lines[i].qty + "-" + invoice.lines[i].name,
+                placeholder: invoice.lines[i].name,
+                checked: true
+                // disabled: true
+            });
+        }
+        var alert = this.alertCtrl.create({
+            title: invoice.current_organization,
+            subTitle: '<span class="' +
+                invoice.payment_status +
+                '">STATUS : ' +
+                invoice.display_status +
+                "</span>",
+            message: "\n          <div class=\"my-message\">\n            \n            <strong>Address: </strong>" +
+                invoice.street +
+                "\n            \n          </div>\n      ",
+            /*
+            <strong>Description: </strong>`+invoice.description+`
+            <br/>
+            <hr>
+            <br/>
+            <strong>Totat: </strong>`+invoice.amount.amount+' '+invoice.amount.code+`
+            <br/>
+            <strong>Paid: </strong>`+invoice.paid.amount+' '+invoice.paid.code+`
+            <br/>
+            <strong>Outstanding: </strong>`+invoice.outstanding.amount+' '+invoice.outstanding.code+`
+            */
+            inputs: inputs,
+            buttons: ["Dismiss"]
+        });
+        alert.present();
+    };
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: "page-home",template:/*ion-inline-start:"/Users/mullahkhan/Desktop/freshBooks Invoices /freshBooks-Ionic3/src/pages/home/home.html"*/'<ion-header>\n  <ion-navbar>\n    <!-- <button ion-button menuToggle>\n      <ion-icon name="menu"></ion-icon>\n    </button> -->\n    <ion-title>FreshBooks</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n  <h3>Invoices of </h3>\n  <!-- {{business_memberships.length}}{{selected_business_membership}} -->\n  <ion-item>\n    <ion-label>Business</ion-label>\n    <ion-select [(ngModel)]="selected_business_membership">\n      <ion-option *ngFor="let business_membership of business_memberships" [value]="business_membership.business.account_id">{{business_membership.business.name}}</ion-option>\n    </ion-select>\n  </ion-item>\n  <br/>\n  <!-- {{data|json}} -->\n  <ion-item>\n    <ion-label>Date</ion-label>\n    {{myDate}}\n    <ion-datetime displayFormat="DDD DD MMMM YYYY" pickerFormat="DDD DD MMMM YYYY" [(ngModel)]="myDate" (ngModelChange)="dateChanged()"></ion-datetime>\n  </ion-item>\n  <ion-list>\n    <ion-item>\n\n      <ion-row no-padding>\n        <ion-col no-padding>\n          <div>\n            <h2> </h2>\n          </div>\n        </ion-col>\n\n        <ion-col no-padding text-right>\n          <ion-note>\n            <h2>outstanding</h2>\n          </ion-note>\n        </ion-col>\n      </ion-row>\n\n    </ion-item>\n    <ion-item *ngFor="let invoice of data" (click)="showDetail(invoice,$event)">\n\n      <ion-row no-padding>\n        <ion-col no-padding>\n          <div>\n            <h2>{{invoice.fname}} {{invoice.lname}}</h2>\n          </div>\n        </ion-col>\n\n        <ion-col no-padding text-right>\n          <ion-note>\n            <h2 [class]="invoice.payment_status">{{invoice.payment_status=="unpaid"?invoice.outstanding.amount:"PAID"}}</h2>\n          </ion-note>\n        </ion-col>\n      </ion-row>\n\n      <p>{{invoice.notes}}</p>\n    </ion-item>\n  </ion-list>\n  <li *ngIf="data?.length == 0">\n    <span class="search_no_results">\n      No invoice found\n    </span>\n  </li>\n</ion-content>'/*ion-inline-end:"/Users/mullahkhan/Desktop/freshBooks Invoices /freshBooks-Ionic3/src/pages/home/home.html"*/
+            selector: "page-home",template:/*ion-inline-start:"/Users/mullahkhan/Documents/GitHub/freshBooks/Source/freshBooks-Ionic3/src/pages/home/home.html"*/'<ion-header>\n  <ion-navbar>\n    <!-- <button ion-button menuToggle>\n      <ion-icon name="menu"></ion-icon>\n    </button> -->\n    <ion-title>FreshBooks</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n  <h3>Invoices of </h3>\n  <!-- {{business_memberships.length}}{{selected_business_membership}} -->\n  <ion-item>\n    <ion-label>Business</ion-label>\n    <ion-select [(ngModel)]="selected_business_membership">\n      <ion-option *ngFor="let business_membership of business_memberships" [value]="business_membership.organization_id">{{business_membership.name}}</ion-option>\n    </ion-select>\n  </ion-item>\n  <br/>\n  <!-- {{data|json}} -->\n  <ion-item>\n    <ion-label>Date</ion-label>\n    {{myDate}}\n    <ion-datetime displayFormat="DDD DD MMMM YYYY" pickerFormat="DDD DD MMMM YYYY" [(ngModel)]="myDate" (ngModelChange)="dateChanged()"></ion-datetime>\n  </ion-item>\n  <ion-list>\n    <ion-item>\n\n      <ion-row no-padding>\n        <ion-col no-padding>\n          <div>\n            <h2> </h2>\n          </div>\n        </ion-col>\n\n        <ion-col no-padding text-right>\n          <ion-note>\n            <h2>outstanding</h2>\n          </ion-note>\n        </ion-col>\n      </ion-row>\n\n    </ion-item>\n    <ion-item *ngFor="let invoice of data" (click)="showDetail(invoice,$event)">\n\n      <ion-row no-padding>\n        <ion-col no-padding>\n          <div>\n            <h2>{{invoice.customer_name}}</h2>\n          </div>\n        </ion-col>\n\n        <ion-col no-padding text-right class="balance">\n          <ion-note>\n            <h2 [class]="invoice.status">{{invoice.status=="paid"?"PAID":invoice.balance}}</h2>\n          </ion-note>\n        </ion-col>\n      </ion-row>\n\n      <p>{{invoice.notes}}</p>\n      <p>Delivery Time: {{invoice.cf_time}}</p>\n    </ion-item>\n  </ion-list>\n  <li *ngIf="data?.length == 0">\n    <span class="search_no_results">\n      No invoice found\n    </span>\n  </li>\n</ion-content>'/*ion-inline-end:"/Users/mullahkhan/Documents/GitHub/freshBooks/Source/freshBooks-Ionic3/src/pages/home/home.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* ModalController */],
             __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
@@ -568,7 +710,7 @@ var ListPage = /** @class */ (function () {
     };
     ListPage = ListPage_1 = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-list',template:/*ion-inline-start:"/Users/mullahkhan/Desktop/freshBooks Invoices /freshBooks-Ionic3/src/pages/list/list.html"*/'<ion-header>\n  <ion-navbar>\n    <button ion-button menuToggle>\n      <ion-icon name="menu"></ion-icon>\n    </button>\n    <ion-title>List</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content>\n  <ion-list>\n    <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">\n      <ion-icon [name]="item.icon" item-start></ion-icon>\n      {{item.title}}\n      <div class="item-note" item-end>\n        {{item.note}}\n      </div>\n    </button>\n  </ion-list>\n  <div *ngIf="selectedItem" padding>\n    You navigated here from <b>{{selectedItem.title}}</b>\n  </div>\n</ion-content>\n'/*ion-inline-end:"/Users/mullahkhan/Desktop/freshBooks Invoices /freshBooks-Ionic3/src/pages/list/list.html"*/
+            selector: 'page-list',template:/*ion-inline-start:"/Users/mullahkhan/Documents/GitHub/freshBooks/Source/freshBooks-Ionic3/src/pages/list/list.html"*/'<ion-header>\n  <ion-navbar>\n    <button ion-button menuToggle>\n      <ion-icon name="menu"></ion-icon>\n    </button>\n    <ion-title>List</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content>\n  <ion-list>\n    <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">\n      <ion-icon [name]="item.icon" item-start></ion-icon>\n      {{item.title}}\n      <div class="item-note" item-end>\n        {{item.note}}\n      </div>\n    </button>\n  </ion-list>\n  <div *ngIf="selectedItem" padding>\n    You navigated here from <b>{{selectedItem.title}}</b>\n  </div>\n</ion-content>\n'/*ion-inline-end:"/Users/mullahkhan/Documents/GitHub/freshBooks/Source/freshBooks-Ionic3/src/pages/list/list.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* NavParams */]])
     ], ListPage);
@@ -745,6 +887,14 @@ var MyApp = /** @class */ (function () {
                 console.log("Successfully matched route", match);
             }, function (nomatch) {
                 console.error("Got a deeplink that didn't match", nomatch);
+                if (nomatch == "cordova_not_available") {
+                    //try as web
+                    // var url = new URL(window.location);
+                    // var code = url.searchParams.get("code");
+                    // console.log(code);
+                    // this.helper.ls.set("code", code).then(() => {
+                    // });
+                }
             });
         });
     };
@@ -758,7 +908,7 @@ var MyApp = /** @class */ (function () {
         __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Nav */])
     ], MyApp.prototype, "nav", void 0);
     MyApp = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"/Users/mullahkhan/Desktop/freshBooks Invoices /freshBooks-Ionic3/src/app/app.html"*/'<ion-menu [content]="content">\n  <ion-header>\n    <ion-toolbar>\n      <ion-title>Menu</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n  <ion-content>\n    <ion-list>\n      <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">\n        {{p.title}}\n      </button>\n    </ion-list>\n  </ion-content>\n\n</ion-menu>\n\n<!-- Disable swipe-to-go-back because it\'s poor UX to combine STGB with side menus -->\n<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>'/*ion-inline-end:"/Users/mullahkhan/Desktop/freshBooks Invoices /freshBooks-Ionic3/src/app/app.html"*/
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"/Users/mullahkhan/Documents/GitHub/freshBooks/Source/freshBooks-Ionic3/src/app/app.html"*/'<ion-menu [content]="content">\n  <ion-header>\n    <ion-toolbar>\n      <ion-title>Menu</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n  <ion-content>\n    <ion-list>\n      <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">\n        {{p.title}}\n      </button>\n    </ion-list>\n  </ion-content>\n\n</ion-menu>\n\n<!-- Disable swipe-to-go-back because it\'s poor UX to combine STGB with side menus -->\n<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>'/*ion-inline-end:"/Users/mullahkhan/Documents/GitHub/freshBooks/Source/freshBooks-Ionic3/src/app/app.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_9__providers_fresh_books_api_fresh_books_api__["a" /* FreshBooksApiProvider */],
             __WEBPACK_IMPORTED_MODULE_8__providers_helper_helper__["a" /* HelperProvider */],
