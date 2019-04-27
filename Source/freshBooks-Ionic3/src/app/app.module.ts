@@ -5,6 +5,7 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
+import { WeekOrdersPage } from "../pages/week-orders/week-orders";
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -13,12 +14,14 @@ import { FreshBooksApiProvider } from '../providers/fresh-books-api/fresh-books-
 import { HttpModule } from '@angular/http';
 import { Deeplinks } from '@ionic-native/deeplinks';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { CodePush } from '@ionic-native/code-push';
 import { HelperProvider } from '../providers/helper/helper';
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    ListPage
+    ListPage,
+    WeekOrdersPage
   ],
   imports: [
     BrowserModule,
@@ -29,11 +32,12 @@ import { HelperProvider } from '../providers/helper/helper';
   entryComponents: [
     MyApp,
     HomePage,
-    ListPage
+    ListPage,
+    WeekOrdersPage
   ],
   providers: [
     StatusBar,
-    SplashScreen,Deeplinks,InAppBrowser,
+    SplashScreen,Deeplinks,InAppBrowser,CodePush,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     FreshBooksApiProvider,
     HelperProvider,

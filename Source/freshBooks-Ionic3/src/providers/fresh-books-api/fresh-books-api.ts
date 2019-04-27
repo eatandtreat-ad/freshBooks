@@ -10,6 +10,7 @@ import "rxjs/add/operator/map";
 import { Platform } from "ionic-angular";
 import { HelperProvider } from "../helper/helper";
 import { InAppBrowser } from "@ionic-native/in-app-browser";
+import { CodePush } from '@ionic-native/code-push';
 /*
   Generated class for the FreshBooksApiProvider provider.
 
@@ -22,10 +23,13 @@ export class FreshBooksApiProvider {
     public http: Http,
     public platform: Platform,
     public helper: HelperProvider,
+    private codePush: CodePush,
     public iab: InAppBrowser
   ) {
     if (this.platform.is("core") == true) {
-      this.redirect_uri = "http://localhost:8100";
+      this.enableProxy = false;
+
+      this.redirect_uri = "http://127.0.0.1:8100/";
       this.client_secret = "ca26cbcf9331671d6a33f7a3cb58b699376ab3ab72";
       this.client_id = "1000.ES1M6NYBATU881971BF1X0142A9JOM";
 
@@ -40,6 +44,7 @@ export class FreshBooksApiProvider {
         "&access_type=offline";
       // "https://my.freshbooks.com/service/auth/oauth/authorize?client_id=71e3a6e71804375e8c2055b34e05444a41c86312ac49dd5aaa5146d3cc9dea13&response_type=code&redirect_uri=https://eatandtreat-ad.github.io/freshBooks";
     } else {
+      this.checkUpdate();
       this.authenticationUrl =
         "https://accounts.zoho.com/oauth/v2/auth?" +
         "scope=" +
@@ -54,6 +59,19 @@ export class FreshBooksApiProvider {
     console.log("Hello FreshBooksApiProvider Provider");
   }
 
+  checkUpdate = () => {
+    try {
+      this.platform.ready().then(() => {
+        this.codePush.sync().subscribe((syncStatus) => console.log(syncStatus));
+
+        const downloadProgress = (progress) => { console.log(`Downloaded ${progress.receivedBytes} of ${progress.totalBytes}`); }
+        this.codePush.sync({}, downloadProgress).subscribe((syncStatus) => console.log(syncStatus));
+      });
+    } catch (e) {
+
+    }
+  };
+
   enableProxy = true;
 
   redirect_uri = "eatandtreat://freshBooks/";
@@ -66,34 +84,48 @@ export class FreshBooksApiProvider {
   getAuthorization = () => {
     return new Promise(resolve => {
       this.platform.ready().then(() => {
-        if (this.platform.is("core") == true) {
-          let qs_code = this.getParameterByName("code");
-          if (!!qs_code) {
-            this.helper.ls.set("code", qs_code).then(() => {
-              this._webAuthorization(resolve);
+        this.helper.ls.get("auth").then(auth => {
+          if (!!auth) {
+            resolve(auth);
+            return;
+          } else {
+
+          }
+          if (this.platform.is("core") == true) {
+            this.helper.ls.get("auth").then(auth => {
+              if (!!auth) {
+                resolve(auth);
+              } else {
+                let qs_code = this.getParameterByName("code");
+                if (!!qs_code) {
+                  this.helper.ls.set("code", qs_code).then(() => {
+                    this._webAuthorization(resolve);
+                  });
+                } else {
+                  this._webAuthorization(resolve);
+                }
+              }
             });
           } else {
-            this._webAuthorization(resolve);
-          }
-        } else {
-          this.helper.ls.get("code").then(code => {
-            if (!code) {
-              this.helper.ls.remove("auth");
-              const browser = this.iab.create(this.authenticationUrl);
-              browser.show();
-            } else {
-              this.helper.ls.get("auth").then(auth => {
-                this.helper.ls.get("refresh_token").then(refresh_token => {
-                  if (!auth) {
-                    this._getAuthWithCode(code, resolve);
-                  } else {
-                    this._getAuthWithAuth(auth, refresh_token, resolve);
-                  }
+            this.helper.ls.get("code").then(code => {
+              if (!code) {
+                this.helper.ls.remove("auth");
+                const browser = this.iab.create(this.authenticationUrl);
+                browser.show();
+              } else {
+                this.helper.ls.get("auth").then(auth => {
+                  this.helper.ls.get("refresh_token").then(refresh_token => {
+                    if (!auth) {
+                      this._getAuthWithCode(code, resolve);
+                    } else {
+                      this._getAuthWithAuth(auth, refresh_token, resolve);
+                    }
+                  });
                 });
-              });
-            }
-          });
-        }
+              }
+            });
+          }
+        });
       });
     });
   };
@@ -116,12 +148,12 @@ export class FreshBooksApiProvider {
 
   getInvoice = (account_id, invoice_id) => {
     return new Promise(resolve => {
-      // this.getAuthorization().then((auth: any) => {
-      //   this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
-      // });
-      this.helper.ls.get("auth").then((auth: any) => {
+      this.getAuthorization().then((auth: any) => {
         this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
       });
+      // this.helper.ls.get("auth").then((auth: any) => {
+      //   this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
+      // });
     });
   };
 
@@ -132,13 +164,14 @@ export class FreshBooksApiProvider {
         location.href = this.authenticationUrl;
       } else {
         this.helper.ls.get("auth").then(auth => {
-          this.helper.ls.get("refresh_token").then(refresh_token => {
-            if (!auth) {
-              this._getAuthWithCode(code, resolve);
-            } else {
-              this._getAuthWithAuth(auth, refresh_token, resolve);
-            }
-          });
+          // this.helper.ls.get("refresh_token").then(refresh_token => {
+          //   if (!auth) {
+          //     this._getAuthWithCode(code, resolve);
+          //   } else {
+          //     this._getAuthWithAuth(auth, refresh_token, resolve);
+          //   }
+          // });
+          this._getAuthWithCode(code, resolve);
         });
       }
     });
@@ -326,7 +359,7 @@ export class FreshBooksApiProvider {
     } else {
       url = "https://invoice.zoho.com/api/v3";
     }
-    url += "/invoices?due_date=" + searchString;
+    url += "/invoices?" + searchString;
     let headers = new Headers();
     headers.append("Content-Type", "application/json");
     headers.append("Authorization", "Zoho-oauthtoken " + access_token);
@@ -397,6 +430,10 @@ export class FreshBooksApiProvider {
   private resetAppVariableToLoginAgain() {
     this.helper.ls.remove("auth");
     this.helper.ls.remove("code");
-    location.reload();
+    if (this.platform.is("core") == true) {
+      location.href = location.origin;
+    }
+    else
+      location.reload();
   }
 }

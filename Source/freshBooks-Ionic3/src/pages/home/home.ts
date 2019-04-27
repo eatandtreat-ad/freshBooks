@@ -34,11 +34,12 @@ export class HomePage {
       this.dateChanged();
     });
   }
+
   dateChanged = () => {
     this.showLoading();
     let date = moment(this.myDate).format("YYYY-MM-DD");
     this.freshBooksApiProvider
-      .getInvoices(this.selected_business_membership, date)
+      .getInvoices(this.selected_business_membership, ("due_date=" + date))
       .then((data: any) => {
         this.data = data.invoices;
         this.hideLoading();
@@ -68,7 +69,7 @@ export class HomePage {
         .getInvoice(this.selected_business_membership, invoice.invoice_id)
         .then((data: any) => {
           debugger;
-          Object.assign(invoice,data.invoice);
+          Object.assign(invoice, data.invoice);
           // invoice.lines = data.invoice.line_items;
           this.hideLoading();
           this.showItems(invoice);

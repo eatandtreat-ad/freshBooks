@@ -5,6 +5,7 @@ import { SplashScreen } from "@ionic-native/splash-screen";
 
 import { HomePage } from "../pages/home/home";
 import { ListPage } from "../pages/list/list";
+import { WeekOrdersPage } from "../pages/week-orders/week-orders";
 import { Deeplinks } from "@ionic-native/deeplinks";
 import { InAppBrowser } from "@ionic-native/in-app-browser";
 import { HelperProvider } from "../providers/helper/helper";
@@ -34,7 +35,7 @@ export class MyApp {
     // used for an example of ngFor and navigation
     this.pages = [
       { title: "Home", component: HomePage },
-      { title: "List", component: ListPage }
+      { title: "Week Orders", component: WeekOrdersPage }      
     ];
   }
 
