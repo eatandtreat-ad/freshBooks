@@ -50,15 +50,29 @@ export class WeekOrdersPage {
         this.invoices = data.invoices;
         this.extractedCount = 0;
         this.invoiceItems = [];
+        this.materialData = [];
         this.extractInvoiceItems();
         this.hideLoading();
       });
   }
 
+
+  // extractItemsContents = (item_id) => {
+  //   // let item_id = "1764297000000669001";
+  //   this.freshBooksApiProvider
+  //     .getItemDetail(this.selected_business_membership, item_id)
+  //     .then((data: any) => {
+
+  //       // this.showItems(data);
+  //     });
+  // }
+
   extractedCount = 0;
   extractInvoiceItems = () => {
     if (this.extractedCount >= this.invoices.length) {
       //DONE
+      this.calculatePCs();
+
       return;
     }
     let invoice = this.invoices[this.extractedCount];
@@ -73,19 +87,71 @@ export class WeekOrdersPage {
       });
   }
 
+  getReportOnConsole = () => {
+    let retVal = [];
+    for (let i in this.invoices) {
+      let ret: any = {};
+      let invoice = this.invoices[i];
+
+      ret.notes = this.invoices[i].notes;
+      ret.line_items = this.invoices[i].line_items.map(item => { return { name: item.name, description: item.description }; });
+      ret.total = this.invoices[i].total;
+      ret.balance = this.invoices[i].balance;
+      ret.name = this.invoices[i].contact_persons_details[0].first_name + " " + this.invoices[i].contact_persons_details[0].last_name;
+      ret.phone = this.invoices[i].contact_persons_details.phone;
+      ret.billing_address = this.invoices[i].billing_address.address;
+
+
+      retVal.push(ret);
+
+    }
+    console.log(retVal);
+    // copy(retVal);
+  }
+
   getInOrder = (items) => {
     return _.orderBy(items, ["quantity"], ["desc"]);
   }
-  
+
   addItemsToDisplay = items => {
-    items.forEach(item => {
+    // return new Promise(resolve => {
+    items.forEach(async (item) => {
       let foundItem = _.find(this.invoiceItems, function (obj) {
         return obj.item_id === item.item_id;
       });
       if (!!foundItem)
         foundItem.quantity += item.quantity;
-      else
+      else {
+        await this.freshBooksApiProvider
+          .getItemDetail(this.selected_business_membership, item.item_id)
+          .then((data: any) => {
+            item.detail = data.item;
+            // this.showItems(data);
+          });
         this.invoiceItems.push(item);
+      }
+    });
+    // });
+
+  }
+
+  materialData = [];
+  calculatePCs = () => {
+    debugger;
+    this.materialData = [];
+    this.invoiceItems.forEach(item => {
+      item.detail.custom_fields.forEach(custom_field => {
+        let foundMaterialItem = _.find(this.materialData, function (obj) {
+          return obj.customfield_id === custom_field.customfield_id;
+        });
+        if (!foundMaterialItem) {
+          custom_field.quantity = 0;
+          foundMaterialItem = custom_field;
+          this.materialData.push(foundMaterialItem);
+        }
+        foundMaterialItem.quantity = foundMaterialItem.quantity + (custom_field.value * item.quantity);
+      });
+
     });
   }
 
