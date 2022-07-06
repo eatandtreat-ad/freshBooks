@@ -28,11 +28,22 @@ export class FreshBooksApiProvider {
   ) {
     if (this.platform.is("core") == true) {
       this.enableProxy = false;
-
       this.redirect_uri = "http://127.0.0.1:8100/";
       this.client_secret = "ca26cbcf9331671d6a33f7a3cb58b699376ab3ab72";
       this.client_id = "1000.ES1M6NYBATU881971BF1X0142A9JOM";
 
+      try {
+        const parsedUrl = new URL(window.location.href);
+        const baseUrl = parsedUrl.origin;
+        if(baseUrl.includes("github.com")){
+          this.redirect_uri = "https://eatandtreat-ad.github.io/freshBooks/";
+          this.client_secret = "bd983560d6e62b177627de0ceab61d9de264975385";
+          this.client_id = "1000.RPMVIDKO99TL3UVG5DDJFUQM360SXH";
+        }
+
+      } catch (error) {
+
+      }
       this.authenticationUrl =
         "https://accounts.zoho.com/oauth/v2/auth?" +
         "scope=" +
