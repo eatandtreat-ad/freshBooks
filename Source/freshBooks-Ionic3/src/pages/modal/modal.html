@@ -8,9 +8,9 @@
 
   <ion-navbar>
     <ion-title>
-      {{invoice.current_organization}} -
+      {{invoice.customer_name}} -
       <span [ngClass]="invoice.payment_status">
-        {{invoice.display_status}}
+        {{invoice.status}}
       </span>
     </ion-title>
   </ion-navbar>
@@ -20,10 +20,11 @@
 
   <ion-list no-padding>
     <ion-item text-wrap no-padding>
-      <h2> Address : </h2>
-      <h2>{{invoice.street}} - {{invoice.street2}}</h2>
+      <h2> Billing Address : </h2>
+      <h2>{{invoice.billing_address.address}} - {{invoice.billing_address.street2}}</h2>
+      <h2>{{invoice.shipping_address.address}} - {{invoice.shipping_address.street2}}</h2>
     </ion-item>
-    <ion-item no-padding text-wrap *ngFor="let item of invoice.lines">
+    <ion-item no-padding text-wrap *ngFor="let item of invoice.line_items">
       <ion-avatar item-start>
         <h1>{{item.qty}} </h1>
       </ion-avatar>
@@ -31,7 +32,7 @@
       <p>{{item.description }}</p>
       <!-- <p>{{item | json}}</p> -->
       <ion-avatar item-end>
-        <h2>{{item.amount.amount}} </h2>
+        <h2>{{item.quantity}} </h2>
       </ion-avatar>
 
     </ion-item>

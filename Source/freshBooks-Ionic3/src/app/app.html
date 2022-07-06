@@ -11,8 +11,17 @@
         {{p.title}}
       </button>
     </ion-list>
-  </ion-content>
 
+
+  </ion-content>
+  <ion-footer>
+    <ion-navbar text-center color="light" (click)="closeModal()">
+      <ion-title>
+        <ion-icon></ion-icon>
+        v # 2.7
+      </ion-title>
+    </ion-navbar>
+  </ion-footer>
 </ion-menu>
 
 <!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
