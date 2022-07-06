@@ -1,0 +1,84 @@
+<!--
+  Generated template for the ModalPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title> Total Invoices in duration </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content no-padding>
+  <ion-item>
+    <ion-label>From Date</ion-label>
+    {{myDate}}
+    <ion-datetime
+      displayFormat="DDD DD MMMM YYYY"
+      pickerFormat="DDD DD MMMM YYYY"
+      [(ngModel)]="fromDate"
+    >
+    </ion-datetime>
+  </ion-item>
+  <ion-item>
+    <ion-label>To Date</ion-label>
+    {{myDate}}
+    <ion-datetime
+      displayFormat="DDD DD MMMM YYYY"
+      pickerFormat="DDD DD MMMM YYYY"
+      [(ngModel)]="toDate"
+    ></ion-datetime>
+  </ion-item>
+  <ion-toolbar color="light">
+    Extracted Invoices {{extractedCount}} of {{invoices.length}}
+    <ion-buttons end>
+      <button
+        ion-button
+        round
+        outline
+        item-end
+        icon-end
+        color="dark"
+        (click)="extractInvoices()"
+        [disabled]="extractedCount<invoices.length"
+      >
+        {{extractedCount>=invoices.length?'Extract':'Please Wait...'}}
+        <ion-icon name="cloud-download"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  Material Summary
+  <ion-list padding>
+    <ion-item no-padding text-wrap *ngFor="let item of materialData">
+      <h2>{{item.label}}</h2>
+      <ion-avatar item-end>
+        <h2>{{item.quantity}}</h2>
+      </ion-avatar>
+    </ion-item>
+  </ion-list>
+  All Items in Invoice
+  <ion-list padding>
+    <ion-item
+      no-padding
+      text-wrap
+      *ngFor="let item of getInOrder(invoiceItems)"
+    >
+      <h2>{{item.name}}</h2>
+      <p>{{item.description }}</p>
+      <p>{{item.rate}} {{item.rate*item.quantity}}</p>
+      <ion-avatar item-end>
+        <h2>{{item.quantity}}</h2>
+        <p>@{{item.rate}}</p>
+      </ion-avatar>
+
+      <ion-avatar item-end>
+        <p>{{item.rate*item.quantity}}</p>
+      </ion-avatar>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,9 +1,12 @@
 page-home {
+  .balance h2{
+    color: rgb(99, 4, 4);
+  }
   .unpaid {
-    color: red;
+    color: red !important;
   }
   .paid {
-    color: green;
+    color: green !important;
   }
   .alert-message, .my-message {
     text-align: left !important;

@@ -25678,12 +25678,16 @@ ion-navbar.toolbar {
   min-height: calc(46px + env(safe-area-inset-bottom));
 }
 
+page-home .balance h2 {
+  color: #630404;
+}
+
 page-home .unpaid {
-  color: red;
+  color: red !important;
 }
 
 page-home .paid {
-  color: green;
+  color: green !important;
 }
 
 page-home .alert-message, page-home .my-message {

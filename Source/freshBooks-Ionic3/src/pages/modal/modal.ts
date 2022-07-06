@@ -14,7 +14,7 @@ import { IonicPage, NavController, NavParams, ViewController } from "ionic-angul
   templateUrl: "modal.html"
 })
 export class ModalPage {
-  invoice: any = {};
+  invoice: any = {billing_address:{},shipping_address:{}};
   constructor(public navCtrl: NavController, public viewCtrl : ViewController, public navParams: NavParams) {}
 
   public closeModal() {
