@@ -35,7 +35,7 @@ export class FreshBooksApiProvider {
       try {
         const parsedUrl = new URL(window.location.href);
         const baseUrl = parsedUrl.origin;
-        if(baseUrl.includes("github.com")){
+        if(baseUrl.includes("github")){
           this.redirect_uri = "https://eatandtreat-ad.github.io/freshBooks/";
           this.client_secret = "bd983560d6e62b177627de0ceab61d9de264975385";
           this.client_id = "1000.RPMVIDKO99TL3UVG5DDJFUQM360SXH";
