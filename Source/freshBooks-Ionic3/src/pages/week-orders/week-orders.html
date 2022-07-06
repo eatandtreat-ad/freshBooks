@@ -37,6 +37,17 @@
       </button>
     </ion-buttons>
   </ion-toolbar>
+  Material Summary
+  <ion-list padding>
+    <ion-item no-padding text-wrap *ngFor="let item of materialData">
+      <h2> {{item.label}}</h2>
+      <ion-avatar item-end>
+        <h2>{{item.quantity}} </h2>
+      </ion-avatar>
+    </ion-item>
+
+  </ion-list>
+  All Items in Invoice
   <ion-list padding>
     <ion-item no-padding text-wrap *ngFor="let item of getInOrder(invoiceItems)">
       <h2> {{item.name}}</h2>

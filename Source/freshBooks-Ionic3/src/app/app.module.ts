@@ -16,12 +16,14 @@ import { Deeplinks } from '@ionic-native/deeplinks';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { CodePush } from '@ionic-native/code-push';
 import { HelperProvider } from '../providers/helper/helper';
+import { ExtractInvoiceDetailPage } from '../pages/extract-invoice-detail/extract-invoice-detail';
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
     ListPage,
-    WeekOrdersPage
+    WeekOrdersPage,
+    ExtractInvoiceDetailPage
   ],
   imports: [
     BrowserModule,
@@ -33,14 +35,15 @@ import { HelperProvider } from '../providers/helper/helper';
     MyApp,
     HomePage,
     ListPage,
-    WeekOrdersPage
+    WeekOrdersPage,
+    ExtractInvoiceDetailPage
   ],
   providers: [
     StatusBar,
-    SplashScreen,Deeplinks,InAppBrowser,CodePush,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    SplashScreen, Deeplinks, InAppBrowser, CodePush,
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
     FreshBooksApiProvider,
     HelperProvider,
   ]
 })
-export class AppModule {}
+export class AppModule { }

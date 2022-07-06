@@ -157,6 +157,30 @@ export class FreshBooksApiProvider {
     });
   };
 
+  sendEmail = (account_id, mailBody) => {
+    return new Promise(resolve => {
+      this.getAuthorization().then((auth: any) => {
+        this._SendEmail(auth.access_token, account_id, mailBody, resolve);
+      });
+      // this.helper.ls.get("auth").then((auth: any) => {
+      //   this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
+      // });
+    });
+  };
+
+
+  getItemDetail = (account_id, item_id) => {
+    return new Promise(resolve => {
+      this.getAuthorization().then((auth: any) => {
+        this._getItem(auth.access_token, account_id, item_id, resolve);
+      });
+      // this.helper.ls.get("auth").then((auth: any) => {
+      //   this._getInvoice(auth.access_token, account_id, invoice_id, resolve);
+      // });
+    });
+  };
+
+
   private _webAuthorization(resolve: (value?: {} | PromiseLike<{}>) => void) {
     this.helper.ls.get("code").then(code => {
       if (!code) {
@@ -339,6 +363,81 @@ export class FreshBooksApiProvider {
         resolve(data);
       });
   }
+
+  private _SendEmail(
+    access_token: string,
+    account_id: string,
+    mailBody: {},
+    resolve: (value?: {} | PromiseLike<{}>) => void
+  ) {
+    /*
+      
+  // $ curl https://invoice.zoho.com/api/v3/contacts/{contact_id}/statements/email
+  // -X POST
+  // -H "X-com-zoho-invoice-organizationid: 10234695"
+  // -H "Content-Type: application/json;charset=UTF-8"
+  // -H "Authorization: Zoho-oauthtoken 1000.41d9f2cfbd1b7a8f9e314b7aff7bc2d1.8fcc9810810a216793f385b9dd6e125f"
+  // -d '{"field":"value","field":"value"}'
+      */
+    let url = "/freshbooks";
+    if (this.platform.is("core") == true && this.enableProxy) {
+      url = "/freshbooks";
+    } else {
+      url = "https://invoice.zoho.com/api/v3";
+    }
+    url += "/contacts/1764297000000083999/statements/email";
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Zoho-oauthtoken " + access_token);
+    headers.append("X-com-zoho-invoice-organizationid", account_id);
+    let body = mailBody;
+    let options = new RequestOptions({ headers: headers });
+    this.http
+      .post(url, body, options)
+      .map(res => res.json())
+      .subscribe(data => {
+        // we've got back the raw data, now generate the core schedule data
+        // and save the data for later reference
+        resolve(data);
+      });
+  }
+
+
+  private _getItem(
+    access_token: string,
+    account_id: string,
+    item_id: any,
+    resolve: (value?: {} | PromiseLike<{}>) => void
+  ) {
+    /*
+      curl -X GET 
+      -H 'Authorization: Bearer 8763331008cf21cdf7a6ad3a36753734e599ff96d4b80544446da4033191dd00' 
+      -H 'Api-Version: alpha' 
+      -H 'Content-Type: application/json' 
+      https://api.freshbooks.com/accounting/account/K5Vxa/invoices/invoices?search%5Bnotes%5D=Wednesday
+      */
+    let url = "/freshbooks";
+    if (this.platform.is("core") == true && this.enableProxy) {
+      url = "/freshbooks";
+    } else {
+      url = "https://invoice.zoho.com/api/v3";
+    }
+    url += "/items/" + item_id;
+    let headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Zoho-oauthtoken " + access_token);
+    headers.append("X-com-zoho-invoice-organizationid", account_id);
+    let options = new RequestOptions({ headers: headers });
+    this.http
+      .request(url, options)
+      .map(res => res.json())
+      .subscribe(data => {
+        // we've got back the raw data, now generate the core schedule data
+        // and save the data for later reference
+        resolve(data);
+      });
+  }
+
 
   private _getInvoices(
     access_token: string,

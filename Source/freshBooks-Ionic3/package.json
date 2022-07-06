@@ -10,7 +10,8 @@
     "lint": "ionic-app-scripts lint",
     "ionic:build": "ionic-app-scripts build",
     "ionic:serve": "ionic-app-scripts serve",
-    "cprs": "ionic cordova prepare ios;appcenter codepush release-cordova -a oobbaz-r3dh/Eat-and-Treat -d Staging --mandatory --description \"Stagging V # $VERSION\""
+    "ios-build": "ionic cordova prepare ios;",
+    "cprs": "appcenter codepush release-cordova -a oobbaz-r3dh/Eat-and-Treat -d Staging --mandatory --description \"Stagging V # $VERSION\""
   },
   "dependencies": {
     "@angular/animations": "5.2.10",

@@ -10,6 +10,7 @@ import { Deeplinks } from "@ionic-native/deeplinks";
 import { InAppBrowser } from "@ionic-native/in-app-browser";
 import { HelperProvider } from "../providers/helper/helper";
 import { FreshBooksApiProvider } from "../providers/fresh-books-api/fresh-books-api";
+import { ExtractInvoiceDetailPage } from "../pages/extract-invoice-detail/extract-invoice-detail";
 
 @Component({
   templateUrl: "app.html"
@@ -35,7 +36,9 @@ export class MyApp {
     // used for an example of ngFor and navigation
     this.pages = [
       { title: "Home", component: HomePage },
-      { title: "Week Orders", component: WeekOrdersPage }      
+      { title: "Week Orders", component: WeekOrdersPage },
+      { title: "Extract Invoice Detail", component: ExtractInvoiceDetailPage }
+
     ];
   }
 
@@ -71,7 +74,7 @@ export class MyApp {
               // var code = url.searchParams.get("code");
               // console.log(code);
               // this.helper.ls.set("code", code).then(() => {
-                
+
               // });
             }
           }
